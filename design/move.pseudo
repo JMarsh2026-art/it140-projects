@@ -1,25 +1,88 @@
 # Project One Move-Between-Rooms Pseudocode
-#
-# Graded checkpoint: Module Five Project One
-# Later use: conceptual support for M6; movement design for M7
-#
-# Review the course-provided movement flowchart before completing this file.
-# Write pseudocode, not Python code. Use clear indentation and course-appropriate
-# keywords such as INPUT, OUTPUT, IF, ELSE, WHILE, SET, or similar terms.
+// ============================================================================
+// TODO 1: Identify the information the movement process needs.
+// ============================================================================
+// To execute a move, the system requires:
+// 1. rooms        -> The game map layout dictionary containing all 8 rooms, 
+//                    their directional connections, and room items.
+// 2. current_room -> A string variable tracking the player's current location.
+// 3. direction    -> A string tracking the target compass direction ("North", etc.).
 
-# TODO 1: Identify the information the movement process needs.
-# Consider the player's current room and movement command.
 
-# TODO 2: Prompt for and receive the player's movement command.
+// ============================================================================
+// TODO 6: Show how movement fits into repeated gameplay.
+// ============================================================================
+// Start the repeated main gameplay loop. 
+// It will continue running indefinitely until a break condition (Win/Loss/Exit) is reached.
+WHILE game_is_running IS TRUE:
+    
+    // Display current location tracking status to the player
+    PRINT "You are in the " + current_room
+    
+    // ============================================================================
+    // TODO 2: Prompt for and receive the player's movement command.
+    // ============================================================================
+    PRINT "Enter your move (e.g., 'Go North', 'Go East') or type 'Exit':"
+    INPUT user_string = Get user input text, strip whitespace, and normalize casing
+    
+    // Tokenize raw user input by splitting it on the space character
+    SPLIT user_string INTO tokens_array (max split of 1)
+    
+    // Check if input is empty to avoid index errors
+    IF tokens_array IS EMPTY THEN
+        CONTINUE loop
+    ENDIF
+    
+    // Store command components
+    SET action = tokens_array[0]
+    
+    // Early escape route handle
+    IF action EQUALS "Exit" THEN
+        PRINT "Thanks for playing!"
+        BREAK loop
+    ENDIF
+    
+    // Isolate movement actions
+    IF action EQUALS "Go" AND length of tokens_array IS GREATER THAN 1 THEN
+        SET direction = tokens_array[1]
+        
+        // ============================================================================
+        // TODO 3: Validate whether the requested movement is possible from the current room.
+        // ============================================================================
+        // Check if the input direction exists as a valid key inside the current room's dictionary entry
+        IF direction EXISTS WITHIN rooms[current_room] THEN
+            
+            // ============================================================================
+            // TODO 4: Describe what happens when the movement command is valid.
+            // ============================================================================
+            // 1. Update the player's location variable to match the destination room string value
+            SET current_room = rooms[current_room][direction]
+            
+            // 2. Provide successful movement feedback text confirmation
+            PRINT "You successfully traveled " + direction + " to the next area."
+            
+        ELSE
+            // ============================================================================
+            // TODO 5: Describe what happens when the movement command is invalid.
+            // ============================================================================
+            // 1. Inform the user they cannot traverse that path
+            PRINT "You can't go that way!"
+            
+            // 2. Provide contextual aid by showing a list of valid structural keys available from this room
+            PRINT "Available exits from here: " + list keys of rooms[current_room] excluding "item"
+            
+        ENDIF
+        
+    ELSE IF action EQUALS "Get" THEN
+        // (Item picking logic runs independently here as structured in the storyboard)
+        CONTINUE loop
+    ELSE
+        PRINT "Invalid input command template."
+    ENDIF
+    
+    // Check for room-based win/loss triggers (Control Room validation checks)
+    IF current_room EQUALS "Control Room" THEN
+        BREAK loop
+    ENDIF
 
-# TODO 3: Validate whether the requested movement is possible from the
-# current room. Show the decision clearly.
-
-# TODO 4: Describe what happens when the movement command is valid.
-# Include the room update and player output.
-
-# TODO 5: Describe what happens when the movement command is invalid.
-# Include the output the player should receive.
-
-# TODO 6: Show how movement fits into repeated gameplay.
-# The final game continues accepting commands until a required ending occurs.
+ENDWHILE
