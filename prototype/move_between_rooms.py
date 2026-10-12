@@ -8,15 +8,38 @@ rooms = {
     "Cellar": {"west": "Bedroom"},
 }
 
-
-# TODO: Set the player's starting room for the simplified prototype.
-
-# TODO: Create the gameplay loop required by the milestone.
-# Within the loop, complete the required behavior in small steps:
-#   1. Display the current room.
-#   2. Prompt for a movement command or "exit".
-#   3. Branch for a valid move, exit, or invalid input.
-#   4. Update the room only after a valid movement command.
-#   5. Continue until the required exit condition is reached.
-
-# TODO: Run and debug all milestone cases in prototype/README.md.
+# Simplified 8-room map dictionary tracking directional connectivity paths
+rooms = {
+    'Cryo Chamber': {  # 1. Start Room
+        'North': 'Research Lab',
+        'East': 'Crew Quarters'
+    },
+    'Research Lab': {  # 2. Room
+        'South': 'Cryo Chamber',
+        'East': 'Storage Bay'
+    },
+    'Storage Bay': {  # 3. Room
+        'West': 'Research Lab',
+        'East': 'Engine Room'
+    },
+    'Engine Room': {  # 4. Room
+        'West': 'Storage Bay',
+        'South': 'Reactor Core'
+    },
+    'Reactor Core': {  # 5. Room
+        'North': 'Engine Room',
+        'West': 'Greenhouse'
+    },
+    'Greenhouse': {  # 6. Room
+        'East': 'Reactor Core',
+        'West': 'Crew Quarters'
+    },
+    'Crew Quarters': {  # 7. Room
+        'West': 'Cryo Chamber',
+        'East': 'Greenhouse',
+        'North': 'Control Room'  # Path leading to the ending area
+    },
+    'Control Room': {  # 8. Ending / Villain Room
+        'South': 'Crew Quarters'
+    }
+}
