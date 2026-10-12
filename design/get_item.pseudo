@@ -1,33 +1,155 @@
 # Project One Get-Item Pseudocode
 #
 # Graded checkpoint: Module Five Project One
-# Later use: get-item and inventory design for M7 Project Two
-#
-# Review the course-provided get-item flowchart before completing this file.
-# Write pseudocode, not Python code. Use clear indentation and course-appropriate
-# keywords such as INPUT, OUTPUT, IF, ELSE, SET, ADD, or similar terms.
+START
 
-START get_item
+    // ============================================================================
+    // Step 1: Initialize game world
+    // ============================================================================
+    // Define locations (8), items (6), villains (1), and structural connections
+    SET rooms = {
+        'Cryo Chamber':  {'North': 'Research Lab', 'East': 'Crew Quarters'},
+        'Research Lab':  {'South': 'Cryo Chamber', 'East': 'Storage Bay', 'item': 'Keycard'},
+        'Storage Bay':   {'West': 'Research Lab', 'East': 'Engine Room', 'item': 'Spacesuit'},
+        'Engine Room':   {'West': 'Storage Bay', 'South': 'Reactor Core', 'item': 'Plasma Torch'},
+        'Reactor Core':  {'North': 'Engine Room', 'West': 'Greenhouse', 'item': 'Fuel Cell'},
+        'Greenhouse':    {'East': 'Reactor Core', 'West': 'Crew Quarters', 'item': 'Oxygen Tank'},
+        'Crew Quarters': {'West': 'Cryo Chamber', 'East': 'Greenhouse', 'North': 'Control Room', 'item': 'Navigation Chip'},
+        'Control Room':  {'South': 'Crew Quarters', 'item': 'Malfunctioning AI'}
+    }
+    SET required_items_count = 6
 
-    # TODO 1: Identify the information the get-item process needs.
-    # Consider the current room, item in that room, and player's inventory.
+    // ============================================================================
+    // Step 2: Initialize player states
+    // ============================================================================
+    SET current_room = "Cryo Chamber"
+    SET inventory = []
+    SET game_over_flag = FALSE
 
-    # TODO 2: Prompt for and receive the player's get-item command.
+    // ============================================================================
+    // Step 3: Start of game message(s)
+    // ============================================================================
+    PRINT "=================================================="
+    PRINT "               SPACE STATION ESCAPE               "
+    PRINT "=================================================="
+    PRINT "Collect 6 items to repair the pod before facing the AI!"
 
-    # TODO 3: Validate whether the requested item is available in the current
-    # room. Show the decision clearly.
 
-    # TODO 4: Describe what happens when the item request is valid.
-    # Include the inventory update and player output.
+    // ============================================================================
+    // Step 4: Gameplay (Main Loop Execution)
+    // ============================================================================
+    WHILE game_over_flag IS FALSE:
+        
+        // --- Game over? [False Branch] ---
+        // Display immediate player states/status text
+        PRINT "You are in the " + current_room
+        PRINT "Current inventory: " + inventory
+        
+        IF "item" EXISTS WITHIN rooms[current_room] AND current_room IS NOT "Control Room" THEN
+            PRINT "You see a " + rooms[current_room]["item"]
+        ENDIF
+        PRINT "--------------------------------------------------"
 
-    # TODO 5: Describe what happens when the item request is invalid.
-    # Include the output the player should receive.
+        // --- Player command input prompt ---
+        PRINT "Enter your move (Go <direction>, Get <item>, or Exit):"
+        INPUT user_input = Receive user text input, trim outer whitespace, normalize casing
+        SPLIT user_input INTO tokens_array (max split of 1)
+        
+        IF tokens_array IS EMPTY THEN
+            CONTINUE loop
+        ENDIF
+        
+        SET command_action = tokens_array[0]
+        
+        // Manual termination override check
+        IF command_action EQUALS "Exit" THEN
+            SET game_over_flag = TRUE
+            CONTINUE loop
+        ENDIF
 
-    # TODO 6: Show how the process returns to or continues the larger gameplay
-    # loop after the command is handled.
+        // ============================================================================
+        // Step 5: What is command? (Action Router Split)
+        // ============================================================================
+        
+        // --------------------------------------------------------------------
+        // PATH A: go <direction>
+        // --------------------------------------------------------------------
+        IF command_action EQUALS "Go" AND length of tokens_array IS GREATER THAN 1 THEN
+            SET direction = tokens_array[1]
+            
+            // --- Direction available? Diamond ---
+            IF direction EXISTS WITHIN rooms[current_room] THEN
+                // [Yes Path]: Move between rooms and update player location
+                SET current_room = rooms[current_room][direction]
+                PRINT "You move " + direction + "."
+            ELSE
+                // [No Path]: Can't go that way message
+                PRINT "You can't go that way!"
+            ENDIF
 
-END get_item
+        // --------------------------------------------------------------------
+        // PATH B: get <item>
+        // --------------------------------------------------------------------
+        ELSE IF command_action EQUALS "Get" AND length of tokens_array IS GREATER THAN 1 THEN
+            SET target_item = tokens_array[1]
+            
+            // --- Item available? Diamond ---
+            IF "item" EXISTS WITHIN rooms[current_room] AND rooms[current_room]["item"] EQUALS target_item THEN
+                // [Yes Path]: Get item and add to inventory
+                APPEND rooms[current_room]["item"] TO inventory
+                PRINT "You picked up the " + rooms[current_room]["item"] + "!"
+                REMOVE "item" FROM rooms[current_room] // Item deleted from world state
+            ELSE
+                // [No Path]: Item not available message
+                PRINT "Item not available here or name mismatched!"
+            ENDIF
+
+        // --------------------------------------------------------------------
+        // PATH C: <other> 
+        // --------------------------------------------------------------------
+        ELSE
+            // Invalid command message
+            PRINT "Invalid command format. Please try again."
+        ENDIF
+
+        // ============================================================================
+        // Step 6: End Gameplay loop (Turn Evaluation / State Check Floor)
+        // ============================================================================
+        // Check if the current room transition triggered the villain room ending state
+        IF current_room EQUALS "Control Room" THEN
+            SET game_over_flag = TRUE
+        ENDIF
+
+    ENDWHILE // Loop breaks when game_over_flag evaluates to TRUE
+
+
+    // ============================================================================
+    // Step 7: Player won or lost? (Post-Loop Evaluation Diamond)
+    // ============================================================================
+    IF current_room EQUALS "Control Room" THEN
+        
+        IF length of inventory EQUALS required_items_count THEN
+            // --- Won Branch ---
+            PRINT "Congratulations! You safely bypassed the malfunctioning AI!"
+            PRINT "Player won message: You repaired the pod and escaped into deep space!"
+        ELSE
+            // --- Lost Branch ---
+            PRINT "Oh no! The Malfunctioning AI blocked you from accessing the ship controls."
+            PRINT "Player lost message: You were locked out of life support forever!"
+        ENDIF
+        
+    ELSE
+        PRINT "Game aborted prematurely."
+    ENDIF
+
+    // ============================================================================
+    // Step 8: End of game message(s) & Terminate
+    // ============================================================================
+    PRINT "Thanks for playing Space Station Escape!"
+
+END
 
 
 # References
+
 
